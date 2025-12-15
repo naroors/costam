@@ -15,32 +15,59 @@ function extractQuestionContext() {
   if (selection.length > 5) {
     return `[Zaznaczony tekst]\n${selection}`;
   }
+
   const quizSelectors = [
     '.question-content', '.quiz-question', '#question-text', 
     '.wpProQuiz_question_text', '.qtext', '.formulation',
-    'form', '.wrapper'
+    'form', '.wrapper', 'main'
   ];
+
+  let bestContainer = null;
+  let maxLen = 0;
 
   for (const selector of quizSelectors) {
     const el = document.querySelector(selector);
-    if (el && el.innerText.length > 20) {
-        return `[Kontener Pytania (${selector})]\n${cleanText(el.innerText)}`;
+    if (el && el.innerText.length > maxLen) {
+        bestContainer = el;
+        maxLen = el.innerText.length;
     }
   }
 
-  const main = document.querySelector('main') || document.body;
+  const target = bestContainer || document.body;
   
-  const clone = main.cloneNode(true);
+  const clone = target.cloneNode(true);
   
-  const junk = clone.querySelectorAll('script, style, nav, footer, header, .ad, .advertisement, .sidebar');
+  const junk = clone.querySelectorAll('script, style, nav, footer, header, .ad, .advertisement, .sidebar, noscript, iframe');
   junk.forEach(el => el.remove());
 
-  return `[Cala Strona (Oczyszczona)]\n${cleanText(clone.innerText).substring(0, 5000)}`;
+  return `[Kontekst Strony]\n${domToText(clone).substring(0, 6000)}`;
 }
 
-function cleanText(text) {
-  return text
-    .replace(/\s+/g, ' ') // Collapse multiple spaces
-    .trim();
+function domToText(node) {
+  let text = "";
 
+  if (node.nodeType === Node.TEXT_NODE) {
+    const content = node.textContent;
+    if (node.parentNode && (node.parentNode.tagName === 'PRE' || node.parentNode.tagName === 'CODE')) {
+        return content;
+    }
+    return content.replace(/\s+/g, ' ');
+  }
+
+  if (node.nodeType === Node.ELEMENT_NODE) {
+    const tagName = node.tagName.toUpperCase();
+    
+    const isBlock = ['DIV', 'P', 'H1', 'H2', 'H3', 'LI', 'BR', 'TR', 'PRE', 'BLOCKQUOTE'].includes(tagName);
+    
+    if (isBlock) text += "\n";
+    if (tagName === 'LI') text += "- ";
+
+    for (let child of node.childNodes) {
+      text += domToText(child);
+    }
+    
+    if (isBlock) text += "\n";
+  }
+
+  return text;
 }

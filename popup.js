@@ -2,7 +2,6 @@ document.addEventListener('DOMContentLoaded', () => {
   chrome.storage.local.get(['ollamaHost', 'ollamaModel', 'ollamaTextModel', 'fastMode', 'hqMode'], (result) => {
     if (result.ollamaHost) document.getElementById('hostUrl').value = result.ollamaHost;
     if (result.ollamaModel) document.getElementById('modelName').value = result.ollamaModel;
-    // Default text model to llama3.2 if not set
     document.getElementById('textModelName').value = result.ollamaTextModel || "llama3.2";
     
     if (result.fastMode !== undefined) document.getElementById('fastModeToggle').checked = result.fastMode;
@@ -14,13 +13,12 @@ document.getElementById('solveBtn').addEventListener('click', async () => {
   const resultDiv = document.getElementById('result');
   const solveBtn = document.getElementById('solveBtn');
   const hostUrl = document.getElementById('hostUrl').value.replace(/\/$/, '');
-  const visionModel = document.getElementById('modelName').value; // e.g. llava
-  const textModel = document.getElementById('textModelName').value; // e.g. llama3.2
-const explainMode = true;
+  const visionModel = document.getElementById('modelName').value;
+  const textModel = document.getElementById('textModelName').value;
+  const explainMode = true;
   const fastMode = document.getElementById('fastModeToggle').checked;
-  const hqMode = document.getElementById('hqModeToggle').checked; 
+  const hqMode = document.getElementById('hqModeToggle').checked;
 
-  // Save settings
   chrome.storage.local.set({ 
     ollamaHost: hostUrl, 
     ollamaModel: visionModel, 
@@ -38,7 +36,6 @@ const explainMode = true;
     if (fastMode) {
       screenshotPromise = Promise.resolve(null);
     } else {
-      // quality arg for captureVisibleTab
       screenshotPromise = captureScreenshot(hqMode ? 100 : 40, hqMode); 
     }
 
@@ -92,16 +89,15 @@ async function solveWithOllama(host, model, context, screenshot, outputElement) 
     stream: false,
     images: screenshot ? [screenshot] : [],
     options: {
-      temperature: 0.1, // Low temp for precision
-      num_ctx: 4096     // Increased context for complex logic
+      temperature: 0.1,
+      num_ctx: 4096
     }
   };
 
   try {
     const controller = new AbortController();
-    const timeoutId = setTimeout(() => controller.abort(), 300000);
+    const timeoutId = setTimeout(() => controller.abort(), 300000); 
 
-    // Visual Timer
     let seconds = 0;
     const timerInterval = setInterval(() => {
         seconds++;
@@ -149,12 +145,10 @@ async function captureScreenshot(quality = 40, hqMode = false) {
       }
 
       if (hqMode) {
-        // Return raw base64 without resizing
         resolve(dataUrl.split(',')[1]);
         return;
       }
 
-      // Resize image to max 800px width
       const img = new Image();
       img.onload = () => {
         const canvas = document.createElement('canvas');
@@ -187,17 +181,13 @@ function formatOutput(text) {
   let contentToShow = text;
   
   if (answerMatch && answerMatch[1]) {
-      // Just show the part after the separator
       contentToShow = answerMatch[1].trim();
   } else {
       contentToShow = text;
   }
 
-  // Formatting (Bold, Newlines)
   let formatted = contentToShow.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
   formatted = formatted.replace(/\n/g, '<br>');
   
   return formatted;
-
 }
-
