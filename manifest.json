@@ -1,7 +1,7 @@
 {
   "manifest_version": 3,
   "name": "Jebacz Egzaminu INF-04 Teoria",
-  "version": "1.2alpha",
+  "version": "1.2",
   "permissions": ["activeTab", "scripting", "storage", "tabs"],
   "host_permissions": [
     "http://127.0.0.1/*",
@@ -26,4 +26,5 @@
       "js": ["content.js"]
     }
   ]
+
 }
