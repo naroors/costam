@@ -16,9 +16,9 @@ document.getElementById('solveBtn').addEventListener('click', async () => {
   const hostUrl = document.getElementById('hostUrl').value.replace(/\/$/, '');
   const visionModel = document.getElementById('modelName').value; // e.g. llava
   const textModel = document.getElementById('textModelName').value; // e.g. llama3.2
-const explainMode = true; // Hardcode to true for accuracy
-  const fastMode = document.getElementById('fastModeToggle').checked; // Text Only (uses textModel)
-  const hqMode = document.getElementById('hqModeToggle').checked; // High Quality (no resize)
+const explainMode = true;
+  const fastMode = document.getElementById('fastModeToggle').checked;
+  const hqMode = document.getElementById('hqModeToggle').checked; 
 
   // Save settings
   chrome.storage.local.set({ 
@@ -200,3 +200,4 @@ function formatOutput(text) {
   return formatted;
 
 }
+
