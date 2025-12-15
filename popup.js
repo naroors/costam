@@ -75,8 +75,6 @@ async function solveWithOllama(host, model, context, screenshot, outputElement) 
   const url = `${host}/api/generate`;
   let systemPrompt = "You are an expert exam solver. Your goal is to provide the correct answer based strictly on the provided context.";
 
-  // Hidden Chain-of-Thought Prompt
-  // We ask for reasoning (for accuracy) but will hide it in UI
   let userPrompt = `Context:\n${context}\n\nTask: Solve the question step-by-step. 
   1. First, analyze the question and options carefully.
   2. Then, provide the final answer starting with the separator "### ANSWER:".
@@ -101,7 +99,7 @@ async function solveWithOllama(host, model, context, screenshot, outputElement) 
 
   try {
     const controller = new AbortController();
-    const timeoutId = setTimeout(() => controller.abort(), 300000); // 5 minutes 
+    const timeoutId = setTimeout(() => controller.abort(), 300000);
 
     // Visual Timer
     let seconds = 0;
@@ -184,8 +182,6 @@ async function captureScreenshot(quality = 40, hqMode = false) {
 }
 
 function formatOutput(text) {
-  // Check if we have the separator "### ANSWER:"
-  // Regex to match "### ANSWER:" case insensitive, and capture everything after it
   const answerMatch = text.match(/###\s*ANSWER\s*:?\s*([\s\S]*)/i);
   
   let contentToShow = text;
@@ -194,8 +190,6 @@ function formatOutput(text) {
       // Just show the part after the separator
       contentToShow = answerMatch[1].trim();
   } else {
-      // Fallback: if no separator, try to intelligently find the answer or show all.
-      // Often models just bold the answer, so let's keep it simple for now.
       contentToShow = text;
   }
 
@@ -204,4 +198,5 @@ function formatOutput(text) {
   formatted = formatted.replace(/\n/g, '<br>');
   
   return formatted;
+
 }
